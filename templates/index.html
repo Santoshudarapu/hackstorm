@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Palette Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --secondary: #ec4899;
+            --accent: #f59e0b;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            padding: 2rem 0;
+            color: var(--text);
+            margin: 0;
+            background-image: linear-gradient(45deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.2)), 
+                            url('https://as2.ftcdn.net/jpg/00/93/52/25/1000_F_93522557_yYts5DreiNG6Gvwa4PnTUMUh6JpJDfx1.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.85),
+                rgba(255, 255, 255, 0.75),
+                rgba(255, 255, 255, 0.8)
+            );
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 3rem;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 2rem;
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .keyword-tags-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 1rem;
+            justify-content: center;
+        }
+
+        .keyword-tag {
+            background: white;
+            color: var(--text);
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.75rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+            display: inline-block;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .keyword-tag:hover {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(139, 92, 246, 0.2);
+            border-color: transparent;
+        }
+
+        .keyword-category {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .keyword-category:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(139, 92, 246, 0.1);
+        }
+
+        .category-title {
+            color: var(--primary);
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .category-title i {
+            font-size: 1.2rem;
+        }
+
+        .btn-generate {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(139, 92, 246, 0.2);
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-width: 160px;
+            justify-content: center;
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(139, 92, 246, 0.3);
+            background: linear-gradient(45deg, var(--secondary), var(--primary));
+        }
+
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            justify-content: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .btn-generate {
+                width: 100%;
+            }
+
+            .keyword-tag {
+                min-width: 100px;
+            }
+        }
+
+        .card {
+            background: white;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            border-radius: 1.25rem;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn-generate:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            border-radius: 1rem;
+            background: #ffffff;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        @media (min-width: 640px) {
+            .color-palette {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1.5rem;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .color-palette {
+                grid-template-columns: repeat(5, 1fr);
+            }
+            .container {
+                padding: 2rem;
+            }
+        }
+
+        .color-box {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            transform: translateY(0);
+        }
+
+        .color-box:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .color-box__container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .color-box__hex {
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text);
+            background: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+        }
+
+        .color-box__hex:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .keyword-category {
+            background: white;
+            border-radius: 1.25rem;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .category-title {
+            color: var(--text);
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .keyword-tag {
+            background: #f8fafc;
+            color: var(--text);
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.75rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .keyword-tag:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(99, 102, 241, 0.2);
+        }
+
+        .keyword-tag.active {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(99, 102, 241, 0.2);
+        }
+
+        .toast {
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: #ef4444;
+            text-align: center;
+            padding: 1rem;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            z-index: 50;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .keywords-section {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        @media (min-width: 640px) {
+            .keywords-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function getRandomCell() {
+                const cells = document.querySelectorAll('.bubble-cell');
+                return cells[Math.floor(Math.random() * cells.length)];
+            }
+
+            function getDynamicColors() {
+                const paletteElements = document.querySelectorAll('.color-box');
+                if (paletteElements.length > 0) {
+                    return Array.from(paletteElements).map(el => {
+                        const bgColor = getComputedStyle(el).backgroundColor;
+                        return bgColor.replace(')', ', 0.8)').replace('rgb', 'rgba');
+                    });
+                }
+                return [
+                    'rgba(99, 102, 241, 0.8)',
+                    'rgba(244, 114, 182, 0.8)',
+                    'rgba(34, 211, 238, 0.8)',
+                    'rgba(168, 85, 247, 0.8)',
+                    'rgba(249, 115, 22, 0.8)',
+                    'rgba(16, 185, 129, 0.8)',
+                    'rgba(236, 72, 153, 0.8)',
+                    'rgba(59, 130, 246, 0.8)',
+                    'rgba(139, 92, 246, 0.8)',
+                    'rgba(245, 158, 11, 0.8)'
+                ];
+            }
+
+            function createSmallBubble() {
+                const bubble = document.createElement('div');
+                bubble.className = 'small-bubble';
+                
+                const cell = getRandomCell();
+                const cellRect = cell.getBoundingClientRect();
+                
+                const size = Math.random() * 12 + 4;
+                const delay = Math.random() * 3;
+                const duration = Math.random() * 5 + 5;
+                const opacity = Math.random() * 0.5 + 0.4;
+                const colors = getDynamicColors();
+                const color = colors[Math.floor(Math.random() * colors.length)];
+
+                // Random positions with wider range
+                const range = 150;
+                const startX = Math.random() * range - range/2;
+                const startY = Math.random() * range - range/2;
+                const midX = startX + (Math.random() * range - range/2);
+                const midY = startY + (Math.random() * range - range/2);
+                const endX = midX + (Math.random() * range - range/2);
+                const endY = midY + (Math.random() * range - range/2);
+                const finalX = endX + (Math.random() * range - range/2);
+                const finalY = endY + (Math.random() * range - range/2);
+
+                const pulseDuration = Math.random() * 2 + 1;
+                const sparkleDuration = Math.random() * 1.5 + 0.5;
+                const shimmerDuration = Math.random() * 2 + 2;
+                const glowSize = size / 2;
+
+                bubble.style.cssText = `
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${cellRect.width/2}px;
+                    top: ${cellRect.height/2}px;
+                    --delay: -${delay}s;
+                    --duration: ${duration}s;
+                    --opacity: ${opacity};
+                    --start-x: ${startX}px;
+                    --start-y: ${startY}px;
+                    --mid-x: ${midX}px;
+                    --mid-y: ${midY}px;
+                    --end-x: ${endX}px;
+                    --end-y: ${endY}px;
+                    --final-x: ${finalX}px;
+                    --final-y: ${finalY}px;
+                    --pulse-duration: ${pulseDuration}s;
+                    --sparkle-duration: ${sparkleDuration}s;
+                    --shimmer-duration: ${shimmerDuration}s;
+                    --color: ${color};
+                    --glow-size: ${glowSize}px;
+                `;
+
+                cell.appendChild(bubble);
+
+                setTimeout(() => {
+                    bubble.remove();
+                }, duration * 1000);
+            }
+
+            // Create initial bubbles in waves across all cells
+            const waves = 6;
+            const bubblesPerWave = 40;
+            
+            for (let wave = 0; wave < waves; wave++) {
+                for (let i = 0; i < bubblesPerWave; i++) {
+                    setTimeout(() => {
+                        createSmallBubble();
+                    }, wave * 300 + i * 20);
+                }
+            }
+
+            // Continue creating bubbles in a more natural pattern
+            setInterval(() => {
+                if (Math.random() > 0.3) { // 70% chance to create a bubble
+                    createSmallBubble();
+                }
+            }, 30);
+
+            // Update bubble colors when palette changes
+            const observer = new MutationObserver(() => {
+                const colors = getDynamicColors();
+                document.documentElement.style.setProperty('--small-bubble-colors', colors.join(','));
+            });
+
+            const paletteContainer = document.querySelector('.color-palette');
+            if (paletteContainer) {
+                observer.observe(paletteContainer, { 
+                    childList: true,
+                    subtree: true,
+                    attributes: true,
+                    attributeFilter: ['style']
+                });
+            }
+
+            // Function to convert RGB to Hex
+            function rgbToHex(r, g, b) {
+                return '#' + [r, g, b].map(x => {
+                    const hex = x.toString(16);
+                    return hex.length === 1 ? '0' + hex : hex;
+                }).join('').toUpperCase();
+            }
+
+            // Function to generate palette with keyword
+            function generatePaletteWithKeyword(keyword) {
+                const descriptionInput = document.getElementById('description');
+                descriptionInput.value = keyword;
+                generatePalette();
+            }
+
+            // Original color generation function
+            function generatePalette() {
+                const description = document.getElementById('description').value;
+                if (!description) return;
+
+                const palette = document.querySelector('.color-palette');
+                palette.innerHTML = '<div class="loading-spinner"></div>';
+
+                const formData = new URLSearchParams();
+                formData.append('description', description);
+
+                fetch('/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.colors && Array.isArray(data.colors)) {
+                        palette.innerHTML = '';
+                        data.colors.forEach(color => {
+                            const container = document.createElement('div');
+                            container.className = 'color-box__container';
+                            
+                            const colorBox = document.createElement('div');
+                            colorBox.className = 'color-box';
+                            colorBox.style.backgroundColor = color;
+                            
+                            const hexCode = color.startsWith('#') ? color.toUpperCase().substring(1) : rgbToHex(...color.match(/\d+/g).map(Number)).substring(1);
+                            
+                            const hexSpan = document.createElement('span');
+                            hexSpan.className = 'color-box__hex';
+                            hexSpan.textContent = hexCode;
+
+                            container.appendChild(colorBox);
+                            container.appendChild(hexSpan);
+
+                            const copyHex = () => {
+                                navigator.clipboard.writeText('#' + hexCode).then(() => {
+                                    showToast(`Copied #${hexCode} to clipboard!`);
+                                    hexSpan.style.opacity = '1';
+                                    setTimeout(() => {
+                                        hexSpan.style.opacity = '0.85';
+                                    }, 200);
+                                });
+                            };
+
+                            colorBox.addEventListener('click', copyHex);
+                            hexSpan.addEventListener('click', copyHex);
+                            
+                            palette.appendChild(container);
+                        });
+                    } else {
+                        throw new Error('Invalid response format');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Error generating palette. Please try again.');
+                    palette.innerHTML = '<div class="error-message">Failed to generate palette. Please try again.</div>';
+                });
+            }
+
+            // Update event listeners
+            document.getElementById('paletteForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                generatePalette();
+            });
+
+            // Update keyword click handlers
+            document.querySelectorAll('.keyword-tag').forEach(tag => {
+                tag.addEventListener('click', function() {
+                    const keyword = this.textContent.trim();
+                    document.getElementById('description').value = keyword;
+                    generatePalette();
+                    
+                    // Update active state
+                    document.querySelectorAll('.keyword-tag').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Function to copy color
+            function copyColor(color) {
+                navigator.clipboard.writeText(color).then(() => {
+                    showToast(`Copied ${color} to clipboard!`);
+                });
+            }
+
+            // Function to show toast notification
+            function showToast(message) {
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.textContent = message;
+                document.querySelector('.toast-container').appendChild(toast);
+                
+                requestAnimationFrame(() => {
+                    toast.classList.add('show');
+                    setTimeout(() => {
+                        toast.classList.remove('show');
+                        setTimeout(() => toast.remove(), 200);
+                    }, 2000);
+                });
+            }
+
+            // Highlight active keyword if it matches the current description
+            document.addEventListener('DOMContentLoaded', function() {
+                const description = document.getElementById('description').value.toLowerCase();
+                if (description) {
+                    document.querySelectorAll('.keyword-tag').forEach(tag => {
+                        if (description.includes(tag.textContent.toLowerCase())) {
+                            tag.classList.add('active');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1>Color Palette Generator</h1>
+                <p class="description">Create beautiful color combinations with words</p>
+            </div>
+            <div class="card-body">
+                <form id="paletteForm">
+                    <div class="input-group">
+                        <textarea class="form-control" name="description" id="description" rows="2" 
+                            placeholder="Try: 'sunset colors' or 'ocean breeze'" required>{{ description if description else '' }}</textarea>
+                        <button type="submit" class="btn btn-generate">
+                            <i class="fas fa-wand-magic-sparkles me-2"></i>Generate Colors
+                        </button>
+                    </div>
+
+                    <div class="color-palette">
+                        {% if colors %}
+                        {% for color in colors %}
+                        <div class="color-box__container">
+                            <div class="color-box" style="background-color: {{ color }}"></div>
+                            <span class="color-box__hex">{{ color }}</span>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <div class="keywords-section">
+                        <div class="keyword-category">
+                            <h3 class="category-title">
+                                <i class="fas fa-sun" style="color: #f59e0b"></i>
+                                Nature & Elements
+                            </h3>
+                            <div class="keyword-tags-wrapper">
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('sunset')">sunset</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('ocean')">ocean</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('forest')">forest</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('beach')">beach</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('mountain')">mountain</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('desert')">desert</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('sky')">sky</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('fire')">fire</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('water')">water</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('earth')">earth</span>
+                            </div>
+                        </div>
+
+                        <div class="keyword-category">
+                            <h3 class="category-title">
+                                <i class="fas fa-cloud-sun" style="color: #0ea5e9"></i>
+                                Seasons & Time
+                            </h3>
+                            <div class="keyword-tags-wrapper">
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('spring')">spring</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('summer')">summer</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('autumn')">autumn</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('winter')">winter</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('dawn')">dawn</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('dusk')">dusk</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('night')">night</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('morning')">morning</span>
+                            </div>
+                        </div>
+
+                        <div class="keyword-category">
+                            <h3 class="category-title">
+                                <i class="fas fa-palette" style="color: #ec4899"></i>
+                                Styles & Moods
+                            </h3>
+                            <div class="keyword-tags-wrapper">
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('vibrant')">vibrant</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('muted')">muted</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('pastel')">pastel</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('warm')">warm</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('cool')">cool</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('bright')">bright</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('dark')">dark</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('royal')">royal</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('elegant')">elegant</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('vintage')">vintage</span>
+                            </div>
+                        </div>
+
+                        <div class="keyword-category">
+                            <h3 class="category-title">
+                                <i class="fas fa-lightbulb" style="color: #eab308"></i>
+                                Try Combinations
+                            </h3>
+                            <div class="keyword-tags-wrapper">
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('warm sunset')">warm sunset</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('ocean breeze')">ocean breeze</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('forest morning')">forest morning</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('desert night')">desert night</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('spring garden')">spring garden</span>
+                                <span class="keyword-tag" onclick="generatePaletteWithKeyword('autumn forest')">autumn forest</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
